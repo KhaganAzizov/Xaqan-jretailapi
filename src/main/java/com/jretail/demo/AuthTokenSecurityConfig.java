@@ -76,7 +76,7 @@ public class AuthTokenSecurityConfig extends WebSecurityConfigurerAdapter {
                 }
             });
             httpSecurity.
-                    antMatcher("/getjson/**").
+                    antMatcher("/products/**").
                     csrf().disable().
                     sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).
                     and().addFilter(filter).authorizeRequests().anyRequest().authenticated();

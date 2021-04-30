@@ -4,23 +4,27 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.sql.*;
+import java.util.regex.Pattern;
 
-@RestController
+@Service
 public class ReadData {
     String readdata(String masternum, String periodnum, String producutid, String conurl) {
+        if (!Pattern.matches("^-?[0-9]*$", producutid)) {
+            return "";
+        }
         String sqlcommand;
-        if(producutid.equals("-1")){
-            sqlcommand="SELECT CODE, DESCRIPTION,BARCODE, SALES_PRICE FROM " +
+        if (producutid.equals("-1")) {
+            sqlcommand = "SELECT CODE, DESCRIPTION,BARCODE, SALES_PRICE FROM " +
                     "(select A.ID,CODE,DESCRIPTION,B.BARCODE,C.SALES_PRICE,C.CREATE_DATE from JRETAIL_MASTER_" + masternum + "..MATERIAL A " +
                     "JOIN JRETAIL_MASTER_" + masternum + "..MATERIAL_BARCODE B on A.ID=B.MATERIAL_ID " +
                     "JOIN JRETAIL_PERIOD_" + masternum + "_" + periodnum + "..MATERIAL_SALES_PRICE  C ON A.ID=C.MATERIAL_ID) Y " +
                     "WHERE Y.CREATE_DATE = (SELECT MAX(CREATE_DATE) FROM JRETAIL_PERIOD_" + masternum + "_" + periodnum + "..MATERIAL_SALES_PRICE X WHERE X.MATERIAL_ID=Y.ID )";
-        }
-        else {
-            sqlcommand="SELECT CODE, DESCRIPTION,BARCODE, SALES_PRICE FROM " +
+        } else {
+            sqlcommand = "SELECT CODE, DESCRIPTION,BARCODE, SALES_PRICE FROM " +
                     "(select A.ID,CODE,DESCRIPTION,B.BARCODE,C.SALES_PRICE,C.CREATE_DATE from JRETAIL_MASTER_" + masternum + "..MATERIAL A " +
                     "JOIN JRETAIL_MASTER_" + masternum + "..MATERIAL_BARCODE B on A.ID=B.MATERIAL_ID " +
                     "JOIN JRETAIL_PERIOD_" + masternum + "_" + periodnum + "..MATERIAL_SALES_PRICE  C ON A.ID=C.MATERIAL_ID) Y " +
@@ -49,8 +53,7 @@ public class ReadData {
             String prettyJsonString = gson.toJson(object);
             System.out.println(object.toString());
             return prettyJsonString;
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return "";
